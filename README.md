@@ -148,3 +148,13 @@ Tetlock's Methodology
 
 
 Built as an experimental forecasting interface by MisoPretty.
+
+## Deployment (Render)
+
+1. Render dashboard → **New → Web Service** → connect the `forecaster-v2` repo. Do **not** reuse the existing forecaster service — this V2 needs its own service and database.
+2. Render picks up `render.yaml` automatically: the build installs with pnpm and builds the API + frontend; the start command runs the API server, which also serves the built frontend.
+3. Create a **new PostgreSQL** database on Render (free tier works) and set `DATABASE_URL` to its **internal** database URL on the web service.
+4. Set `GEMINI_API_KEY` to a free key from Google AI Studio (AI generation and grounded search run on it). `OPENROUTER_API_KEY` is an optional fallback.
+5. Deploy. All tables — including the V2 learning tables (`aggregator_weights`, `calibration_params`, `source_trust`) — migrate automatically at boot.
+
+The learned components (logistic aggregator, hierarchical Platt calibration, source-trust memory) start in fallback mode and activate automatically once roughly 25–30 questions have resolved; day-one behavior is the legacy pipeline plus the new baseline-anchored scaffold.
