@@ -1,0 +1,25 @@
+# Render Blueprint — one free web service hosting the whole forecaster:
+# the Express API plus the built Vite frontend (served statically by the API).
+services:
+  - type: web
+    name: forecaster-v2
+    runtime: node
+    plan: free
+    healthCheckPath: /api/healthz
+    buildCommand: >-
+      corepack prepare pnpm@10 --activate &&
+      pnpm install --frozen-lockfile &&
+      PORT=10000 BASE_PATH=/ pnpm --filter @workspace/forecaster run build &&
+      pnpm --filter @workspace/api-server run build
+    startCommand: pnpm --filter @workspace/api-server run start
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: BASE_PATH
+        value: /
+      - key: DATABASE_URL
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false

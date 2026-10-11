@@ -1,0 +1,212 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: forecasts
+    description: Forecast operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /forecasts:
+    get:
+      operationId: listForecasts
+      tags: [forecasts]
+      summary: List all forecasts (history)
+      responses:
+        "200":
+          description: List of forecasts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ForecastSummary"
+    post:
+      operationId: createForecast
+      tags: [forecasts]
+      summary: Create a new forecast (generate analysis)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForecastInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Forecast"
+  /forecasts/stream:
+    post:
+      operationId: streamForecast
+      tags: [forecasts]
+      summary: Stream a new forecast generation as SSE
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForecastInput"
+      responses:
+        "200":
+          description: SSE stream of forecast chunks
+          content:
+            text/event-stream: {}
+  /forecasts/resolve-due:
+    post:
+      operationId: resolveDueForecasts
+      tags: [forecasts]
+      summary: Resolve due forecasts (resolution agent)
+      description: Finds forecasts whose resolveBy has passed with no outcome, asks the resolution agent for the outcome with a source, and records yes/no/ambiguous. Intended for a scheduled ping (e.g. GitHub Actions cron). If RESOLVER_TOKEN is set on the server, send it as the x-resolver-token header.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResolveDueInput"
+      responses:
+        "200":
+          description: Resolution sweep result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResolveDueResult"
+  /forecasts/{id}:
+    get:
+      operationId: getForecast
+      tags: [forecasts]
+      summary: Get one forecast
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Forecast
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Forecast"
+    delete:
+      operationId: deleteForecast
+      tags: [forecasts]
+      summary: Delete a forecast
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    ForecastInput:
+      type: object
+      properties:
+        question:
+          type: string
+          minLength: 3
+          maxLength: 500
+        resolveBy: { type: string, format: date-time }
+        resolutionCriteria: { type: string, maxLength: 1000 }
+        category: { type: string, maxLength: 80 }
+      required: [question]
+    ForecastSource:
+      type: object
+      properties:
+        title: { type: string }
+        url: { type: string }
+        publisher: { type: string }
+        date: { type: string }
+        claim: { type: string }
+        note: { type: string }
+    ForecastSummary:
+      type: object
+      properties:
+        id: { type: integer }
+        question: { type: string }
+        createdAt: { type: string, format: date-time }
+        probability: { type: ["number", "null"] }
+        ciLow: { type: ["number", "null"] }
+        ciHigh: { type: ["number", "null"] }
+        model: { type: ["string", "null"] }
+        category: { type: ["string", "null"] }
+        resolveBy: { type: ["string", "null"], format: date-time }
+        outcome: { type: ["string", "null"] }
+      required: [id, question, createdAt]
+    Forecast:
+      type: object
+      properties:
+        id: { type: integer }
+        question: { type: string }
+        analysis: { type: string, description: "Markdown-formatted forecast analysis" }
+        createdAt: { type: string, format: date-time }
+        probability: { type: ["number", "null"] }
+        ciLow: { type: ["number", "null"] }
+        ciHigh: { type: ["number", "null"] }
+        model: { type: ["string", "null"] }
+        category: { type: ["string", "null"] }
+        resolveBy: { type: ["string", "null"], format: date-time }
+        resolutionCriteria: { type: ["string", "null"] }
+        outcome: { type: ["string", "null"] }
+        sources:
+          type: ["array", "null"]
+          items: { $ref: "#/components/schemas/ForecastSource" }
+        beliefState: { type: ["object", "null"], additionalProperties: true }
+        beliefLog:
+          type: ["array", "null"]
+          items: { type: object, additionalProperties: true }
+        audit: { type: ["object", "null"], additionalProperties: true }
+        resolvedAt: { type: ["string", "null"], format: date-time }
+      required: [id, question, analysis, createdAt]
+    ResolveDueInput:
+      type: object
+      properties:
+        limit: { type: integer, minimum: 1, maximum: 25 }
+    ResolveDueResult:
+      type: object
+      properties:
+        checked: { type: integer }
+        resolved: { type: integer }
+        ambiguous: { type: integer }
+        skipped: { type: integer }
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: integer }
+              outcome: { type: ["string", "null"] }
+              source: { $ref: "#/components/schemas/ForecastSource" }
+              reason: { type: string }
+      required: [checked, resolved, ambiguous, skipped, results]

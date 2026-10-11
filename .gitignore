@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+build/
+*.tsbuildinfo
+
+# generated
+artifacts/mockup-sandbox/src/.generated/
+
+# local env / secrets
+.env
+.env.*
+!.env.example
+
+# database / runtime
+*.db
+*.sqlite
+*.log
+.DS_Store
