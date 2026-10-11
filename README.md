@@ -158,3 +158,32 @@ Built as an experimental forecasting interface by MisoPretty.
 5. Deploy. All tables — including the V2 learning tables (`aggregator_weights`, `calibration_params`, `source_trust`) — migrate automatically at boot.
 
 The learned components (logistic aggregator, hierarchical Platt calibration, source-trust memory) start in fallback mode and activate automatically once roughly 25–30 questions have resolved; day-one behavior is the legacy pipeline plus the new baseline-anchored scaffold.
+
+## Research attributions
+
+The V2 pipeline upgrades are independent implementations inspired by these
+papers — not affiliated with or endorsed by their authors:
+
+- Cao, Y. et al. (2026). *From Narrative to Auditable Forecasts: A Structured
+  Scaffold for Agentic Forecasting (AuditForecast).* arXiv:2609.05905.
+  https://arxiv.org/abs/2609.05905
+- Douven, I. (2026). *Wisdom of LLM Crowds: Aggregation and Contamination in
+  Language Model Ensembles.* arXiv:2607.18269. https://arxiv.org/abs/2607.18269
+- Murphy, K. (2026). *Agentic Forecasting with Structured Linguistic Beliefs
+  (BLF).* arXiv:2604.18576. https://arxiv.org/abs/2604.18576
+- Zhao, Z. & Welsch, R. E. (2026). *Point-in-Time Financial RAG with Frozen
+  LLMs and Market-Feedback Adaptive Retrieval.* arXiv:2605.31201.
+  https://arxiv.org/abs/2605.31201
+- Nuthanakaluva, P. R. & Gaddam, N. K. (2026). *Generalized Gibbs Ensemble
+  Weighting for Forecast Combination.* arXiv:2608.28116.
+  https://arxiv.org/abs/2608.28116
+- Ding, J. et al. (2026). *FIFA World Cup 2026 as a Contamination-Free
+  Benchmark for LLM Forecasting Agents.* arXiv:2607.17765.
+  https://arxiv.org/abs/2607.17765
+
+## License
+
+`package.json` declares this workspace MIT. No `LICENSE` file is present yet —
+one should be added to make that declaration effective. Dependencies are used
+under their own licenses (no GPL-family packages in the dependency tree,
+verified 2026-10-11). All rights reserved unless noted.
