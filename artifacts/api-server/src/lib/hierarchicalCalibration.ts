@@ -12,6 +12,7 @@
 
 import { desc } from "drizzle-orm";
 import { db, calibrationParamsTable } from "@workspace/db";
+import { scheduleGitSync } from "@workspace/db";
 import { getResolvedHistory } from "@workspace/db";
 
 const clamp01 = (x: number) => Math.min(0.99, Math.max(0.01, x));
@@ -78,6 +79,7 @@ async function trainCalibration(): Promise<CalibrationModel | null> {
     nSamples: rows.length,
     method: "hierarchical-platt",
   });
+    scheduleGitSync();
   return model;
 }
 

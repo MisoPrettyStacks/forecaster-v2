@@ -8,6 +8,7 @@
 
 import { and, eq } from "drizzle-orm";
 import { db, sourceTrustTable, type ForecastSource } from "@workspace/db";
+import { scheduleGitSync } from "@workspace/db";
 import { horizonBucket } from "@workspace/db";
 
 export type SourceFamily =
@@ -170,6 +171,7 @@ export async function recordSourceOutcomes(args: {
           alpha: 1 + (correct ? 1 : 0),
           beta: 1 + (correct ? 0 : 1),
         });
+    scheduleGitSync();
       }
     } catch {
       // trust memory is advisory — never break resolution

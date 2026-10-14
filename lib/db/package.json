@@ -14,8 +14,8 @@
   "dependencies": {
     "drizzle-orm": "catalog:",
     "drizzle-zod": "^0.8.3",
-    "pg": "^8.20.0",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "better-sqlite3": "^11.10.0"
   },
   "devDependencies": {
     "@types/node": "catalog:",

@@ -1,6 +1,7 @@
 import { Router, type IRouter, text as textBody } from "express";
 import { desc } from "drizzle-orm";
 import { db, probeLogsTable } from "@workspace/db";
+import { scheduleGitSync } from "@workspace/db";
 import { rateLimit } from "../lib/security";
 import { logger } from "../lib/logger";
 
@@ -31,6 +32,7 @@ router.post(
         ?? null;
       const userAgent = String(req.headers["user-agent"] ?? "").slice(0, 240) || null;
       await db.insert(probeLogsTable).values({ lab, question, ip, userAgent });
+    scheduleGitSync();
     } catch (err) {
       logger.warn({ err }, "probe log insert failed");
     }

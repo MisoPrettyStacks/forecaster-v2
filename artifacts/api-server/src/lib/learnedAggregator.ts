@@ -16,6 +16,7 @@
 
 import { desc } from "drizzle-orm";
 import { db, aggregatorWeightsTable } from "@workspace/db";
+import { scheduleGitSync } from "@workspace/db";
 import {
   getResolvedHistory,
   ensembleRunsOf,
@@ -206,6 +207,7 @@ async function trainAggregator(): Promise<AggregatorModel | null> {
     looLogLoss: bestLoss,
     method: "logistic-loo",
   });
+    scheduleGitSync();
   return model;
 }
 

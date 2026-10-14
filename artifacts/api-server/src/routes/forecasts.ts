@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { desc, eq } from "drizzle-orm";
 import { db, forecastsTable, type Forecast } from "@workspace/db";
+import { scheduleGitSync } from "@workspace/db";
 import {
   CreateForecastBody,
   StreamForecastBody,
@@ -275,6 +276,7 @@ router.post("/forecasts", createLimit, async (req, res, next) => {
         audit: structured.audit,
       })
       .returning();
+    scheduleGitSync();
 
     if (!row) {
       throw new Error("Failed to insert forecast");
@@ -344,6 +346,7 @@ router.post("/forecasts/stream", streamLimit, async (req, res, next) => {
             audit: structured.audit,
           })
           .returning();
+    scheduleGitSync();
         row = inserted[0];
       } catch (persistErr) {
         req.log.error({ err: persistErr }, "Forecast persistence failed");

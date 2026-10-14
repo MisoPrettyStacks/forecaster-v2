@@ -17,8 +17,12 @@ services:
         value: "24"
       - key: BASE_PATH
         value: /
-      - key: DATABASE_URL
+      - key: DATA_DIR
+        value: /opt/render/project/src/data
+      - key: GITHUB_TOKEN
         sync: false
+      - key: GITHUB_REPO
+        value: MisoPrettyStacks/forecaster-v2
       - key: OPENROUTER_API_KEY
         sync: false
       - key: GEMINI_API_KEY
